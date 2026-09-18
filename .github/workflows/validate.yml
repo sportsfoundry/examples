@@ -1,0 +1,48 @@
+name: Examples validation
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Validate shell
+        run: bash -n http/list-sports.sh
+
+      - name: Validate Python
+        run: python -m py_compile python/list_sports.py
+
+      - name: Validate JavaScript
+        run: node --check typescript/list-sports.mjs
+
+      - name: Compile Java
+        run: javac java/ListSports.java
+
+      - name: Build .NET
+        run: dotnet build dotnet/SportsFoundry.Examples.csproj -c Release
